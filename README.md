@@ -9,7 +9,7 @@ A two-party secure computation protocol for computing matrix multiplication.
 * Build
 	* pull the submodule, `git submodule init && git submodule update`
 	* create the build dir, `mkdir build && cd build`
-	* cmake and make `cmake -DCMAKE_BUILD_TYPE=Release && make`
+	* cmake and make `cmake .. -DCMAKE_BUILD_TYPE=Release && make`
 	* check out the executable in `build/bin`
 
 * Main Executable
