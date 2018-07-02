@@ -12,8 +12,8 @@ add_library(cryptgmm ${SRC})
 set(RUNTIME_LIBS   
     fhe
 	cryptgmm
-	    ntl
-	    gf2x
+	gf2x
+    ntl
     pthread
     boost_system
     gmp)
@@ -25,9 +25,9 @@ endmacro()
 
 add_exec(GetCtxtSize)
 add_exec(FindParams)
-#add_exec(MiniONN)
+add_exec(MiniONN)
 add_exec(SMP)
 add_exec(SMP_local)
-#add_exec(faster_unpacking)
+add_exec(faster_unpacking)
 #add_exec(fast_decryption)
-#add_subdirectory(DGK)
+add_subdirectory(DGK)

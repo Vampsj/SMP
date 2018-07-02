@@ -6,6 +6,7 @@ set(RUNTIME_LIBS
     fhe
     cryptgmm
     ntl
+    gf2x
     pthread
     boost_system
     gmp)

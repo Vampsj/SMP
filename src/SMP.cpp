@@ -243,7 +243,7 @@ int run_client(std::string const& addr, long port,
         clt_ben.total_times.push_back(all_time);
         conn.close();
 		resetAllTimers(); // reset timers in HElib
-
+		break;
         ++done;
         auto now_time = std::clock();
         if (now_time - last_time_stamp >= 60 * CLOCKS_PER_SEC) {

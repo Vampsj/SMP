@@ -5,6 +5,7 @@ SET(DGK_SRC
 set(RUNTIME_LIBS   
 	helib
 	cryptgmm
+	gf2x
     ntl
     pthread
     boost_system
