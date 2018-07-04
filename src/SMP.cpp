@@ -397,7 +397,6 @@ int main(int argc, char *argv[]) {
     argmap.parse(argc, argv);
     if (role == 0) {
         //run_server(addr, port, n1, n2, n3);
-        run_server(port, a4,a4,a5);
         run_server_cnn(port);
     } else if (role == 1) {
         //run_client(addr, port, n1, n2, n3);
