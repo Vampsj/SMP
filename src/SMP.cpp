@@ -305,7 +305,7 @@ int main(int argc, char *argv[]) {
 	argmap.arg("p", port, "port");
     argmap.parse(argc, argv);
     if (role == 0) {
-        run_server(addr, port, n1, n2, n3);
+        run_server(port, n1, n2, n3);
     } else if (role == 1) {
         run_client(addr, port, n1, n2, n3);
     } else {
