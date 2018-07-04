@@ -24,21 +24,23 @@ inline long round_div(long a, long b) {
     return (a + b - 1) / b;
 }
 
+// both parties set a matrix C0, C1 to a zero matrix
 void zero(Matrix &mat) {
     for (long i = 0; i < mat.NumRows(); i++)
         for (long j = 0; j < mat.NumCols(); j++)
             mat[i][j] = 0;
 }
 
+// set a matrix with random numbers
 void randomize(Matrix &mat, long p = 3) {
     for (long i = 0; i < mat.NumRows(); i++)
         for (long j = 0; j < mat.NumCols(); j++)
             mat[i][j] = NTL::RandomBnd(p);
 }
 
-
+// Fill a computed inner product into a matrix
 void fill_compute(Matrix& mat,
-				  long row_blk,
+				  long row_blk,//row block ?
 				  long col,
                   const std::vector<long> &inner_prod,
                   const EncryptedArray *ea)
@@ -94,9 +96,12 @@ void play_client(tcp::iostream &conn,
     FHEPubKey ek(sk);
     conn << ek;
     const EncryptedArray *ea = context.ea;
-    const long l = ea->size();
-    const long d = ea->getDegree();
+    const long l = ea->size();    // l messages/slots -> l factor polynomials Fk
+    const long d = ea->getDegree(); // degree of factor polynomials Fk is d
+    // from l and d, we can get m = d * l
+    // X^m + 1 = \prod_{k=0}^{l-1} F_k
 
+    // gound_truth = A * B
     Matrix A, B, ground_truth;
     A.SetDims(n1, n2);
     B.SetDims(n2, n3);
@@ -109,7 +114,11 @@ void play_client(tcp::iostream &conn,
     const long MAX_Y1 = round_div(A.NumCols(), d);
     const long MAX_X2 = round_div(B.NumCols(), l);
 
+    // vector of a vector containing ctxts
     std::vector<std::vector<Ctxt>> uploading;
+    // <v1,v2,...,v_{MAX_X1}>,
+    // where vi = <ctxt(sk), ctxt(sk), ..., ctxt(sk)>
+    // and vi.size = MAX_Y1
     uploading.resize(MAX_X1, std::vector<Ctxt>(MAX_Y1, Ctxt(sk)));
 	double enc_time = 0.;
     double pack_time = 0.;
@@ -295,9 +304,18 @@ int main(int argc, char *argv[]) {
 	argmap.arg("p", port, "port");
     argmap.parse(argc, argv);
     if (role == 0) {
-        run_server(port, n1, n2, n3);
+        //run_server(addr, port, n1, n2, n3);
+        run_server(port, 1, 744, 1);
+        run_server(port, 6138, 6138, 128)
+        run_server(port, 128, 128, 128)
+        run_server(port, 128, 128, 12)
     } else if (role == 1) {
-        run_client(addr, port, n1, n2, n3);
+        //run_client(addr, port, n1, n2, n3);
+        run_client(port, 1, 744, 1);
+        run_client(port, 6138, 6138, 128)
+        run_client(port, 128, 128, 128)
+        run_client(port, 128, 128, 12)
+        
     } else {
 		argmap.usage("General Matrix Multiplication for |N*M| * |M*D|");
 		return -1;
