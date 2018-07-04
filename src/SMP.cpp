@@ -269,6 +269,68 @@ int run_client(std::string const& addr, long port,
     return 0;
 }
 
+int run_client_cnn(std::string const& addr, long port) {
+    const long m = 8192;
+    const long p = 70913;
+    const long r = 1;
+    const long L = 2;
+    long a1 = 1;
+    long a2 = 744;
+    long a3 = 6138;
+    long a4 = 128;
+    long a5 = 12;
+    NTL::zz_p::init(p);
+    FHEcontext context(m, p, r);
+    context.bitsPerLevel = 60;
+    buildModChain(context, L);
+    FHESecKey sk(context);
+    sk.GenSecKey(64);
+    auto start_time_stamp = std::clock();
+    auto last_time_stamp = std::clock();
+    int done = 0;
+    while (true) {
+        tcp::iostream conn(addr, std::to_string(port));
+        if (!conn) {
+            std::cerr << "Can not connect to server!" << std::endl;
+            return -1;
+        }
+        
+        /// send FHEcontext obj
+        double all_time = 0.;
+        do {
+            send_context(conn, context);
+            AutoTimer time(&all_time);
+            // send the evaluation key
+            auto start_time_stamp = std::clock();
+            play_client(conn,sk,context,a1,a2,a1);
+            play_client(conn,sk,context,a3,a3,a4);
+            play_client(conn,sk,context,a4,a4,a4);
+            play_client(conn,sk,context,a4,a4,a5);
+            auto last_time_stamp = std::clock();
+            std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
+        } while(0);
+        clt_ben.total_times.push_back(all_time);
+        conn.close();
+        resetAllTimers(); // reset timers in HElib
+        break;
+        ++done;
+        auto now_time = std::clock();
+        if (now_time - last_time_stamp >= 60 * CLOCKS_PER_SEC) {
+            std::cout << done << "\n";
+            last_time_stamp = now_time;
+        }
+        
+        if (now_time - start_time_stamp >= 3600 * CLOCKS_PER_SEC) {
+            /// one hour
+            break;
+        }
+    }
+    std::cout << "one hour finished: " << done << "\n";
+    return 0;
+}
+
+
+
 int run_server(long port, long n1, long n2, long n3) {
     boost::asio::io_service ios;
     tcp::endpoint endpoint(tcp::v4(), port);
@@ -288,19 +350,42 @@ int run_server(long port, long n1, long n2, long n3) {
     return 0;
 }
 
+int run_server_cnn(long port) {
+    boost::asio::io_service ios;
+    tcp::endpoint endpoint(tcp::v4(), port);
+    tcp::acceptor acceptor(ios, endpoint);
+    long a1 = 1;
+    long a2 = 744;
+    long a3 = 6138;
+    long a4 = 128;
+    long a5 = 12;
+    for (long run = 0; run < REPEAT; run++) {
+        tcp::iostream conn;
+        boost::system::error_code err;
+        acceptor.accept(*conn.rdbuf(), err);
+        
+        if (!err) {
+            auto start_time_stamp = std::clock();
+            SMPServer server;
+            server.run(conn, a1,a2,a1);
+            server.run(conn, a3,a3,a4);
+            server.run(conn, a4,a4,a4);
+            server.run(conn, a4,a4,a5);
+            auto last_time_stamp = std::clock();
+            std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
+            resetAllTimers(); // reset timers in HElib
+        }
+    }
+    SMPServer::print_statistics();
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     ArgMapping argmap;
     long role = -1;
     long n1 = 8;
     long n2 = 8;
     long n3 = 8;
-    //
-    long a1 = 1;
-    long a2 = 744;
-    long a3 = 6138;
-    long a4 = 128;
-    long a5 = 12;
-    //
     std::string addr = "127.0.0.1";
 	long port = 12345;
     argmap.arg("N", n1, "n1");
@@ -311,24 +396,12 @@ int main(int argc, char *argv[]) {
 	argmap.arg("p", port, "port");
     argmap.parse(argc, argv);
     if (role == 0) {
-        auto start_time_stamp = std::clock();
-        
         //run_server(addr, port, n1, n2, n3);
-        run_server(port, a1,a2,a1);
-        run_server(port, a3,a3,a4);
-        run_server(port, a4,a4,a4);
         run_server(port, a4,a4,a5);
-        auto last_time_stamp = std::clock();
-        std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
+        run_server_cnn(port);
     } else if (role == 1) {
         //run_client(addr, port, n1, n2, n3);
-        auto start_time_stamp = std::clock();
-        run_client(addr,a1,a2,a1);
-        run_client(addr,a3,a3,a4);
-        run_client(addr,a4,a4,a4);
-        run_client(addr,a4,a4,a5);
-        auto last_time_stamp = std::clock();
-        std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
+        run_client_cnn(addr,port);
     } else {
 		argmap.usage("General Matrix Multiplication for |N*M| * |M*D|");
 		return -1;
