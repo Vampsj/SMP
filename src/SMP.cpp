@@ -307,19 +307,19 @@ int main(int argc, char *argv[]) {
         auto start_time_stamp = std::clock();
         
         //run_server(addr, port, n1, n2, n3);
-        run_server(port, 1, 744, 1);
-        run_server(port, 6138, 6138, 128);
-        run_server(port, 128, 128, 128);
-        run_server(port, 128, 128, 12);
+        run_server(port, (long)1, (long)744, (long)1);
+        run_server(port, (long)6138, (long)6138,(long) 128);
+        run_server(port, (long)128, (long)128,(long) 128);
+        run_server(port, (long)128, (long)128,(long) 12);
         auto last_time_stamp = std::clock();
         std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
     } else if (role == 1) {
         //run_client(addr, port, n1, n2, n3);
           auto start_time_stamp = std::clock();
-        run_client(port, 1, 744, 1);
-        run_client(port, 6138, 6138, 128);
-        run_client(port, 128, 128, 128);
-        run_client(port, 128, 128, 12);
+        run_client(port, (long)1, (long)744, (long)1);
+        run_client(port, (long)6138, (long)6138,(long) 128);
+        run_client(port, (long)128, (long)128, (long)128);
+        run_client(port,(long) 128, (long)128, (long)12);
         auto last_time_stamp = std::clock();
         std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
     } else {
