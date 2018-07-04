@@ -294,6 +294,13 @@ int main(int argc, char *argv[]) {
     long n1 = 8;
     long n2 = 8;
     long n3 = 8;
+    //
+    long a1 = 1;
+    long a2 = 744;
+    long a3 = 6138;
+    long a4 = 128;
+    long a5 = 12;
+    //
     std::string addr = "127.0.0.1";
 	long port = 12345;
     argmap.arg("N", n1, "n1");
@@ -307,19 +314,19 @@ int main(int argc, char *argv[]) {
         auto start_time_stamp = std::clock();
         
         //run_server(addr, port, n1, n2, n3);
-        run_server(port, (long)1, (long)744, (long)1);
-        run_server(port, (long)6138, (long)6138,(long) 128);
-        run_server(port, (long)128, (long)128,(long) 128);
-        run_server(port, (long)128, (long)128,(long) 12);
+        run_server(port, a1,a2,a1);
+        run_server(port, a3,a3,a4);
+        run_server(port, a4,a4,a4);
+        run_server(port, a4,a4,a5);
         auto last_time_stamp = std::clock();
         std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
     } else if (role == 1) {
         //run_client(addr, port, n1, n2, n3);
-          auto start_time_stamp = std::clock();
-        run_client(port, (long)1, (long)744, (long)1);
-        run_client(port, (long)6138, (long)6138,(long) 128);
-        run_client(port, (long)128, (long)128, (long)128);
-        run_client(port,(long) 128, (long)128, (long)12);
+        auto start_time_stamp = std::clock();
+        run_client(addr,a1,a2,a1);
+        run_client(addr,a3,a3,a4);
+        run_client(addr,a4,a4,a4);
+        run_client(addr,a4,a4,a5);
         auto last_time_stamp = std::clock();
         std::cout << "Total time: " << last_time_stamp - start_time_stamp << "\n";
     } else {
